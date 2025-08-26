@@ -1,0 +1,16 @@
+{
+    "emailAlreadyTaken" : "Email already taken.",
+    "passwordNotMatched": "Password does not match.",
+    "incorrectCredential": "Credentials are incorrect.",
+    "userNotFound": "User not found.",
+    "emailRequired": "Provide an email for this request.",
+    "invalidEmail": "Invalid email provided.",
+    "unableToLoginWithEmail": "Login failed. Retry later.",
+    "firstNameRequired": "Firstname is required.",
+    "serverError": "Something went wrong.",
+    "resourcesNotFound": "The requested resource not found.",
+    "unAuthorized": "You are not authorized to access this data.",
+    "forbiddenException": "You do not have permission to access this resource.",
+    "serverUnavailable": "Service Unavailable",
+    "userAlreadyExists": "User already exists"
+}
