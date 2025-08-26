@@ -1,5 +1,5 @@
 import type { PoolClient, QueryResultRow } from 'pg';
-import type { ModelConstructor } from '../../src/models/BaseModel.js';
+import type { ModelConstructor } from './models/BaseModel.js';
 import { Injectable } from '@nestjs/common';
 
 export interface ReleasableQueryRunner {

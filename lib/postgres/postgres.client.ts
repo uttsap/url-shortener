@@ -3,7 +3,7 @@ import { AnyReleasableQueryRunner, PostgresReadQueryRunner, PostgresWriteQueryRu
 import { AppLogger } from "lib/logger/logger.service";
 import { PostgresConnectionOptions } from "./contracts";
 import assert from "assert";
-import { ModelConstructor } from "src/models/BaseModel";
+import { ModelConstructor } from "lib/postgres/models/BaseModel";
 import { Injectable } from "@nestjs/common";
 
 export enum TransactionIsolationLevel {
