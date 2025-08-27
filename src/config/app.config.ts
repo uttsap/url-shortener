@@ -1,9 +1,9 @@
-import { AppLogger } from 'lib/logger/logger.service';
-import { AppConfig } from './contracts';
 import { INestApplication } from '@nestjs/common';
-import { PostgresClient } from 'lib/postgres/postgres.client';
 import { getCurrentStage } from 'lib/env';
+import { AppLogger } from 'lib/logger/logger.service';
 import { PostgresConnectionOptions } from 'lib/postgres/contracts';
+import { PostgresClient } from 'lib/postgres/postgres.client';
+import { AppConfig } from './contracts';
 
 export const config: AppConfig = {
   database: {
@@ -20,18 +20,8 @@ export const config: AppConfig = {
     url: process.env.REDIS_URL || 'redis://localhost:6379',
     tls: process.env.REDIS_TLS !== 'false'
   },
-  environment: getCurrentStage()
-};
-
-export const onBoot = async (appConfig: Readonly<AppConfig>, app: INestApplication) => {
-  await app.get(AppLogger).initialize();
-
-  const dbConnectionOptions = await getPostgresConnectionConfig(appConfig);
-  await app.get(PostgresClient).connect(dbConnectionOptions);
-};
-
-export const shutdown = async (app: INestApplication) => {
-  await app.get(PostgresClient).disconnect();
+  environment: getCurrentStage(),
+  shortUrlExpiryTime: parseInt(process.env.SHORT_URL_EXPIRY_TIME || '3600') // defaults to 1 hour
 };
 
 export const getPostgresConnectionConfig = async (
@@ -45,4 +35,15 @@ export const getPostgresConnectionConfig = async (
   }
   // Implement scerets manager to get database credentials
   return appConfig.database.postgres;
+};
+
+export const onBoot = async (appConfig: Readonly<AppConfig>, app: INestApplication) => {
+  await app.get(AppLogger).initialize();
+
+  const dbConnectionOptions = await getPostgresConnectionConfig(appConfig);
+  await app.get(PostgresClient).connect(dbConnectionOptions);
+};
+
+export const shutdown = async (app: INestApplication) => {
+  await app.get(PostgresClient).disconnect();
 };

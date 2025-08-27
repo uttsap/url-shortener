@@ -1,13 +1,11 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
-  HttpStatus,
-  HttpException,
-  NotFoundException,
-  UnauthorizedException,
   BadRequestException,
-  ForbiddenException,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
   ServiceUnavailableException
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -21,21 +19,22 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message = '';
     const status = exception.status ? exception.status : HttpStatus.INTERNAL_SERVER_ERROR;
 
+    console.log(exception);
     switch (true) {
-      case exception instanceof BadRequestException:
-        message =
-          !!exception['response'] &&
-          !!exception['response'].message &&
-          Array.isArray(exception['response'].message)
-            ? exception['response'].message[0]
-            : exception['response'].message;
+      case exception instanceof BadRequestException: {
+        const res = exception.getResponse();
+        let msg: string | undefined;
+        if (typeof res === 'string') {
+          msg = res;
+        } else if (Array.isArray((res as unknown as { message: string[] }).message)) {
+          msg = (res as unknown as { message: string[] }).message[0];
+        } else {
+          msg = (res as unknown as { message: string }).message;
+        }
+        message = msg ?? 'Bad Request';
         break;
-      case exception instanceof UnauthorizedException:
-        message = errorMessages.unAuthorized;
-        break;
-      case exception instanceof ForbiddenException:
-        message = errorMessages.forbiddenException;
-        break;
+      }
+
       case exception instanceof NotFoundException:
         message = errorMessages.resourcesNotFound;
         break;

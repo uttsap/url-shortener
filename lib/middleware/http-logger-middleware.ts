@@ -1,8 +1,8 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
-import { Request, Response, NextFunction } from 'express';
-import { generateUri } from '../uri';
+import { NextFunction, Request, Response } from 'express';
 import { AppLogger } from 'lib/logger/logger.service';
 import { requestContext } from 'lib/logger/request.context';
+import { generateUri } from '../uri';
 
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
@@ -18,7 +18,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
         path: req.originalUrl || req.url,
         remoteAddr: req.ip,
         userAgent: req.get('user-agent') || '',
-        requestId,
+        requestId
       };
 
       this.logger.info('Incoming request', logContext);
@@ -29,7 +29,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
           ...logContext,
           status: res.statusCode,
           bytes: res.get('Content-Length') || 0,
-          duration: `${duration}ms`,
+          duration: `${duration}ms`
         });
       });
 

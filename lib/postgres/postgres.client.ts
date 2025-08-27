@@ -1,10 +1,16 @@
-import { Pool, PoolConfig, QueryResultRow } from "pg";
-import { AnyReleasableQueryRunner, PostgresReadQueryRunner, PostgresWriteQueryRunner, ReadQueryRunner, WriteQueryRunner } from "./postgres.query.runner";
-import { AppLogger } from "lib/logger/logger.service";
-import { PostgresConnectionOptions } from "./contracts";
-import assert from "assert";
-import { ModelConstructor } from "lib/postgres/models/BaseModel";
-import { Injectable } from "@nestjs/common";
+import assert from 'assert';
+import { Injectable } from '@nestjs/common';
+import { AppLogger } from 'lib/logger/logger.service';
+import { ModelConstructor } from 'lib/postgres/models/BaseModel';
+import { Pool, PoolConfig, QueryResultRow } from 'pg';
+import { PostgresConnectionOptions } from './contracts';
+import {
+  AnyReleasableQueryRunner,
+  PostgresReadQueryRunner,
+  PostgresWriteQueryRunner,
+  ReadQueryRunner,
+  WriteQueryRunner
+} from './postgres.query.runner';
 
 export enum TransactionIsolationLevel {
   READ_COMMITTED = 'READ COMMITTED',
@@ -20,9 +26,7 @@ export class PostgresClient implements WriteQueryRunner, ReadQueryRunner {
 
   private writePool?: Pool;
 
-  constructor(private readonly logger: AppLogger) {
-
-  }
+  constructor(private readonly logger: AppLogger) {}
 
   public async connect(config: PostgresConnectionOptions) {
     this.assertIsNotConnected(this.readOnlyPool);
@@ -215,7 +219,7 @@ export class PostgresClient implements WriteQueryRunner, ReadQueryRunner {
     }
   }
 
-  /** 
+  /**
    * Throws an error if the pools are not connected by running a test query
    */
   private async assertConnected(): Promise<void> {

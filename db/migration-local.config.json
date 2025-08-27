@@ -1,0 +1,14 @@
+{
+    "connection": {
+      "database": "test",
+      "host": "localhost",
+      "user": "test"
+    },
+    "schemas": [
+      {
+        "schema": "url_shortener",
+        "folder": "db/migrations"
+      }
+    ]
+  }
+  

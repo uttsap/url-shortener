@@ -18,10 +18,15 @@ export interface HasRedisClientConfig {
   };
 }
 
+export interface ApplicationConfig {
+  shortUrlExpiryTime: number; // in seconds
+}
+
 /**
  * Exports the composition of various configuration interfaces
  * as a single application-wide configuration type.
  */
 export type AppConfig = HasPostgresDatabaseConnectionConfig &
   HasRedisClientConfig &
-  HasEnvironmentConfig;
+  HasEnvironmentConfig &
+  ApplicationConfig;

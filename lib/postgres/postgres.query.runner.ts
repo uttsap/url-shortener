@@ -1,6 +1,6 @@
+import { Injectable } from '@nestjs/common';
 import type { PoolClient, QueryResultRow } from 'pg';
 import type { ModelConstructor } from './models/BaseModel.js';
-import { Injectable } from '@nestjs/common';
 
 export interface ReleasableQueryRunner {
   release(): void;

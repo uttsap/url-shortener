@@ -9,8 +9,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - sites_postgres_data:/var/lib/postgresql/data
+      - url_shortener_postgres_data:/var/lib/postgresql/data
 
 volumes:
-  sites_postgres_data:
+  url_shortener_postgres_data:
     driver: local

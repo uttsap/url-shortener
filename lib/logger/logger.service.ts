@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { AbstractLogger } from './logger.abstract';
-import { LogEvent } from './contracts/log-event';
 import { LogLevel } from './const';
+import { LogEvent } from './contracts/log-event';
+import { AbstractLogger } from './logger.abstract';
 import { getRequestId } from './request.context';
 
 @Injectable()
@@ -12,13 +12,13 @@ export class AppLogger extends AbstractLogger {
 
   protected format(content: LogEvent): string {
     const logLevelString: string = LogLevel[content.level].toUpperCase();
-    const logMessageString: string = String(content.message);
+    const logMessageString = String(content.message);
     const requestId = getRequestId();
 
     // Merge context with requestId if available
     const context = {
       ...(content.context || {}),
-      ...(requestId ? { requestId } : {}),
+      ...(requestId ? { requestId } : {})
     };
 
     // If context is empty, return only message
@@ -27,10 +27,6 @@ export class AppLogger extends AbstractLogger {
     }
 
     // Otherwise, include formatted JSON context
-    return `${logLevelString} - ${logMessageString}\n${JSON.stringify(
-      context,
-      null,
-      2
-    )}`;
+    return `${logLevelString} - ${logMessageString}\n${JSON.stringify(context, null, 2)}`;
   }
 }
