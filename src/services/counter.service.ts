@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { CounterRepository } from 'src/persistance/repositories/counter.repository';
 
 @Injectable()
-export class CounterIncrementorService {
+export class CounterService {
   constructor(private readonly counterRepository: CounterRepository) {}
 
-  public async incrementCounter(): Promise<bigint> {
+  public async increment(): Promise<bigint> {
     const shardId = Math.floor(Math.random() * 4) + 1; // pick random shard
     const counter = await this.counterRepository.incrementCounter(shardId);
     const value = BigInt(counter.value);
