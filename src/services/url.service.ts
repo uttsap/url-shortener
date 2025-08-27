@@ -21,11 +21,10 @@ export class UrlService {
     this.logger.debug('Creating short URL', { createShortUrlRequest });
     let alias = createShortUrlRequest.alias;
     if (!alias) {
-      alias = await this.aliasService.generateAlias();
+      alias = await this.aliasService.generate();
     }
 
     const expiryTime = new Date(Date.now() + this.config.shortUrlExpiryTime * 1000);
-    console.log(expiryTime);
 
     const createShortUrlParams: CreateShortUrlParams = {
       ...createShortUrlRequest,
