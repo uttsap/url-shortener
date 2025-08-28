@@ -2,17 +2,17 @@ import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { AppConfig } from './contracts';
 
 @Module({})
-export class ConfigModule {
+export class AppConfigModule {
   static forRoot(config: AppConfig): DynamicModule {
-    const configProvider: Provider = {
+    const appConfigProvider: Provider = {
       provide: 'APP_CONFIG',
       useValue: config
     };
 
     return {
-      module: ConfigModule,
-      providers: [configProvider],
-      exports: [configProvider]
+      module: AppConfigModule,
+      providers: [appConfigProvider],
+      exports: [appConfigProvider]
     };
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateShortUrlParams } from 'src/http/requests/create-shorturl.request';
 import { ShortUrl } from 'src/models/shorturl';
-import { Repository } from './repository';
+import { Repository } from '../../../lib/postgres/repository';
 
 @Injectable()
 export class UrlRepository extends Repository {

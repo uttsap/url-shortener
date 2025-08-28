@@ -15,14 +15,18 @@ export class AppLogger extends AbstractLogger {
     const logMessageString = String(content.message);
     const requestId = getRequestId();
 
+    const baseContext = typeof content.context === 'object' && content.context !== null
+      ? content.context
+      : {};
+
     // Merge context with requestId if available
     const context = {
-      ...(content.context || {}),
+      ...(baseContext || {}),
       ...(requestId ? { requestId } : {})
     };
 
     // If context is empty, return only message
-    if (Object.keys(context).length === 0) {
+    if (Object.keys(content.context || {}).length === 0) {
       return `${logLevelString} - ${logMessageString}`;
     }
 

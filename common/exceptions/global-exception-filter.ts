@@ -19,7 +19,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     let message = '';
     const status = exception.status ? exception.status : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    console.log(exception);
     switch (true) {
       case exception instanceof BadRequestException: {
         const res = exception.getResponse();

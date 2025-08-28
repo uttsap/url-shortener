@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { AppLogger } from 'lib/logger/logger.service';
 import { requestContext } from 'lib/logger/request.context';
-import { generateUri } from '../uri';
+import { generateUri } from '../../lib/uri';
 
 @Injectable()
 export class HttpLoggerMiddleware implements NestMiddleware {
@@ -14,20 +14,22 @@ export class HttpLoggerMiddleware implements NestMiddleware {
 
     requestContext.run({ requestId }, () => {
       const logContext = {
-        method: req.method,
-        path: req.originalUrl || req.url,
-        remoteAddr: req.ip,
-        userAgent: req.get('user-agent') || '',
-        requestId
+        requestId,
+        userAgent: req.get('user-agent') || ''
       };
 
-      this.logger.info('Incoming request', logContext);
+      this.logger.info(
+        `${req.ip} - ${new Date().toISOString()} "${req.method} ${req.originalUrl || req.url}"}`
+      );
+      this.logger.debug('Request started', logContext);
 
       res.on('finish', () => {
         const duration = Date.now() - start;
-        this.logger.info('Request completed', {
+        this.logger.info(
+          `${req.ip} - ${new Date().toISOString()} "${req.method} ${req.path}" ${res.statusCode}`
+        );
+        this.logger.debug('Request completed', {
           ...logContext,
-          status: res.statusCode,
           bytes: res.get('Content-Length') || 0,
           duration: `${duration}ms`
         });

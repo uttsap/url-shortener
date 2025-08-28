@@ -1,18 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { WriteQueryRunner } from 'lib/postgres/postgres.query.runner';
 import { Counter } from 'src/models/counter';
-import { Repository } from './repository';
+import { Repository } from '../../../lib/postgres/repository';
 
 @Injectable()
 export class CounterRepository extends Repository {
-  async incrementCounter(
+  public async incrementCounter(
     shardId: number,
-    transaction?: WriteQueryRunner
+    transaction: WriteQueryRunner = this.db
   ): Promise<Counter> {
-    return this.create<Counter>(
+    const result = await transaction.write<Counter>(
       `UPDATE url_shortener.counters SET value = value + 1 WHERE shard_id = $1 RETURNING *`,
-      [shardId],
-      transaction
+      [shardId]
     );
+    this.assertExactlyOneResult(result);
+    return result[0];
   }
 }
