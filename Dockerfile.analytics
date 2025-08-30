@@ -1,0 +1,42 @@
+FROM node:20-alpine AS deps
+WORKDIR /app
+
+# Copy only the analytics package files
+COPY analytics/package*.json ./
+
+# Install dependencies
+RUN npm ci
+
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Copy the analytics source files
+COPY analytics/ ./analytics/
+
+# Copy lib and common to maintain the expected directory structure
+COPY lib/ ./lib/
+COPY common/ ./common/
+
+# Copy package files and tsconfig
+COPY analytics/package*.json ./
+COPY analytics/tsconfig*.json ./
+
+# Install dependencies
+RUN npm ci
+
+# Run build from analytics directory
+WORKDIR /app/analytics
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# Copy the bundled code from the builder stage
+COPY --from=builder --chown=node:node /app/analytics/dist ./dist
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+
+# Use the node user from the image
+USER node
+
+# Start the server
+CMD ["node", "dist/analytics/src/main.js"]

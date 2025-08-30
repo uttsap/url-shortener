@@ -16,7 +16,7 @@ import { LoggerModule } from 'lib/logger/logger.module';
 import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
-import { cleanDatabase, setupTestDatabase } from '../../test/utils/test-utils';
+import { cleanDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CreateShortUrlRequest } from '../http/requests/create-shorturl.request';
 import { NatsModule } from '../nats/nats.module';
@@ -62,7 +62,6 @@ describe('UrlService', () => {
 
     service = module.get<UrlService>(UrlService);
     postgresClient = module.get<PostgresClient>(PostgresClient);
-    await setupTestDatabase(postgresClient);
     await cleanDatabase(postgresClient);
   });
 

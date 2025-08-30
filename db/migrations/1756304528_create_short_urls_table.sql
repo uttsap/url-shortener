@@ -9,6 +9,10 @@ BEGIN
         PRIMARY KEY (id)
     ) PARTITION BY RANGE (id);
 
+    -- Indexes on partitioned parent (will propagate to partitions)
+    CREATE INDEX idx_urls_expiry_time ON url_shortener.urls (expiry_time);
+
+
     -- Create partitions
     CREATE TABLE IF NOT EXISTS url_shortener.urls_p0 PARTITION OF url_shortener.urls
         FOR VALUES FROM (0) TO (10000000);
@@ -24,4 +28,8 @@ BEGIN
         alias TEXT PRIMARY KEY,
         url_id BIGINT NOT NULL REFERENCES url_shortener.urls(id) ON DELETE CASCADE
     );
+
+    -- Index on aliases for join performance
+    CREATE INDEX idx_aliases_url_id ON url_shortener.aliases(url_id);
+
 END $$;

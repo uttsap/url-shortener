@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { PoolClient, QueryResultRow } from 'pg';
-import type { ModelConstructor } from './models/BaseModel.js';
+import type { ModelConstructor, ModelCreateParams } from './models/BaseModel.js';
 
 export interface ReleasableQueryRunner {
   release(): void;
@@ -81,7 +81,9 @@ export abstract class PostgresQueryRunner implements ReleasableQueryRunner {
       return result.rows;
     }
 
-    return result.rows.map((row) => new model(row));
+    return result.rows.map(
+      (row: unknown) => new model(row as ModelCreateParams<ResultType, never>)
+    );
   }
 
   protected getOverloadedQueryParameters<T>(

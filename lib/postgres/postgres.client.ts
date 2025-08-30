@@ -146,7 +146,7 @@ export class PostgresClient implements WriteQueryRunner, ReadQueryRunner {
   private connectPool(connectionOptions: PoolConfig) {
     const pool = new Pool(connectionOptions);
     const host = connectionOptions.host;
-    pool.on('error', (error) => {
+    pool.on('error', (error: Error) => {
       this.logger.error('Postgres Pool error', {
         name: error.name,
         message: error.message,

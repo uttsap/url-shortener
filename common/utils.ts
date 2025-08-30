@@ -4,7 +4,7 @@ function createSchema<T extends string>(...keys: T[]) {
     return keys;
 }
 
-export const databaseConfigFields = createSchema<PostgresConfigKeys>(
+export const databaseConfigFields = createSchema<string>(
     "host",
     "user",
     "password",
@@ -15,10 +15,10 @@ export const databaseConfigFields = createSchema<PostgresConfigKeys>(
 
 export const hasRequiredProperties = <T extends object>(
     obj: T,
-    requiredFields: (keyof T)[]
+    requiredFields: string[]
   ): boolean => {
     return requiredFields.every(
-      field => obj[field] !== undefined && obj[field] !== null
+      field => obj[field as keyof T] !== undefined && obj[field as keyof T] !== null
     );
   };
   

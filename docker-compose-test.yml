@@ -1,0 +1,30 @@
+services:
+  test-db:
+    image: postgres:15-alpine
+    command: -c fsync=off -c full_page_writes=off
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '5432:5432'
+    volumes:
+      - test_url_shortener_postgres_data:/var/lib/postgresql/data
+
+  test-nats:
+    image: nats:latest
+    container_name: test_nats_server
+    ports:
+      - '4222:4222' # NATS client connections
+      - '8222:8222' # NATS monitoring dashboard
+    command: ['-js'] # enable JetStream (optional, for persistence)
+
+  test-redis-stack:
+    image: redis/redis-stack:7.0.6-RC9
+    ports:
+      - 6379:6379
+      - 8001:8001
+
+volumes:
+  test_url_shortener_postgres_data:
+    driver: local

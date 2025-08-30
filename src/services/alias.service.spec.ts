@@ -4,7 +4,7 @@ import { LoggerModule } from 'lib/logger/logger.module';
 import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
-import { cleanDatabase, setupTestDatabase } from '../../test/utils/test-utils';
+import { cleanDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CounterRepository } from '../persistance/repositories/counter.repository';
 import { AliasService } from './alias.service';
@@ -27,7 +27,6 @@ describe('AliasService', () => {
 
     service = module.get<AliasService>(AliasService);
     postgresClient = module.get<PostgresClient>(PostgresClient);
-    await setupTestDatabase(postgresClient);
     await cleanDatabase(postgresClient);
   });
 

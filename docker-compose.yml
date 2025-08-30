@@ -16,7 +16,7 @@ services:
     container_name: nats_server
     ports:
       - '4222:4222' # NATS client connections
-      - '8222:8222' # NATS monitoring dashboar
+      - '8222:8222' # NATS monitoring dashboard
     command: ['-js'] # enable JetStream (optional, for persistence)
 
   redis-stack:
@@ -24,6 +24,48 @@ services:
     ports:
       - 6379:6379
       - 8001:8001
+
+  url-shortener:
+    build:
+      context: .
+      dockerfile: Dockerfile.app
+    ports:
+      - '3000:3000'
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_READ_ONLY_HOST=db
+      - REDIS_URL=redis://redis-stack:6379
+      - REDIS_TLS=false
+      - NATS_ENDPOINT=nats://nats:4222
+      - LOG_LEVEL=INFO
+      - STAGE=production
+    depends_on:
+      - db
+      - nats
+      - redis-stack
+
+  analytics:
+    build:
+      context: .
+      dockerfile: Dockerfile.analytics
+    ports:
+      - '3001:3001'
+    environment:
+      - POSTGRES_HOST=db
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_READ_ONLY_HOST=db
+      - NATS_ENDPOINT=nats://nats:4222
+      - LOG_LEVEL=INFO
+      - STAGE=production
+    depends_on:
+      - db
+      - nats
+      - redis-stack
 
 volumes:
   url_shortener_postgres_data:
