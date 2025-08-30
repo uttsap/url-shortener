@@ -1,6 +1,5 @@
 import { DynamicModule, Module, Provider } from '@nestjs/common';
 import { AppConfig } from './contracts';
-
 @Module({})
 export class AppConfigModule {
   static forRoot(config: AppConfig): DynamicModule {

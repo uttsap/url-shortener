@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common';
-import { LoggerModule } from 'lib/logger/logger.module';
+import { LoggerModule } from '../../lib/logger/logger.module';
 import { PostgresClient } from './postgres.client';
 
 @Global()

@@ -27,6 +27,18 @@ export class AnalyticsQueryDto {
   offset?: number = 0;
 }
 
+export class ReferrersQueryDto {
+  @IsOptional()
+  @IsString()
+  userAlias?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  limit?: number = 10;
+}
+
 export class AnalyticsStatsResponse {
   totalClicks: number;
   uniqueIps: number;

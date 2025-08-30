@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PostgresClient } from 'lib/postgres/postgres.client';
+import { PostgresClient } from '../../../../lib/postgres/postgres.client';
 import {
   AnalyticsQueryDto,
   AnalyticsStatsResponse,
@@ -14,17 +14,10 @@ export class ClickRepository {
     const query = `
       INSERT INTO url_shortener.clicks (url_alias, user_agent, ip, referrer, latency, error)
       VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id, url_alias as "userAlias", timestamp, user_agent as "userAgent", ip, referrer, latency, error
+      RETURNING id, url_alias as alias, timestamp, user_agent as "userAgent", ip, referrer, latency, error
     `;
 
-    const values = [
-      data.userAlias,
-      data.userAgent,
-      data.ip,
-      data.referrer,
-      data.latency,
-      data.error,
-    ];
+    const values = [data.alias, data.userAgent, data.ip, data.referrer, data.latency, data.error];
 
     const result = await this.postgresClient.write<Click>(query, values);
     return result[0];
@@ -32,7 +25,7 @@ export class ClickRepository {
 
   async findClicks(queryDto: AnalyticsQueryDto): Promise<Click[]> {
     let query = `
-      SELECT id, url_alias as "userAlias", timestamp, user_agent as "userAgent", ip, referrer, latency, error
+      SELECT id, url_alias as alias, timestamp, user_agent as "userAgent", ip, referrer, latency, error
       FROM url_shortener.clicks
       WHERE 1=1
     `;
@@ -104,7 +97,10 @@ export class ClickRepository {
         COUNT(*) as total_clicks,
         COUNT(DISTINCT ip) as unique_ips,
         AVG(latency) as avg_latency,
-        COUNT(CASE WHEN error IS NOT NULL THEN 1 END)::float / COUNT(*)::float as error_rate
+        CASE 
+          WHEN COUNT(*) = 0 THEN 0.0
+          ELSE COUNT(CASE WHEN error IS NOT NULL THEN 1 END)::float / COUNT(*)::float
+        END as error_rate
       FROM url_shortener.clicks
       ${whereClause}
     `;
@@ -157,7 +153,7 @@ export class ClickRepository {
 
   async getClicksByUrlAlias(urlAlias: string): Promise<Click[]> {
     const query = `
-      SELECT id, url_alias as "userAlias", timestamp, user_agent as "userAgent", ip, referrer, latency, error
+      SELECT id, url_alias as alias, timestamp, user_agent as "userAgent", ip, referrer, latency, error
       FROM url_shortener.clicks
       WHERE url_alias = $1
       ORDER BY timestamp DESC

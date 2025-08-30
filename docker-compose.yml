@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   db:
     image: postgres:15-alpine
@@ -7,9 +9,17 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - 5432:5432
+      - '5432:5432'
     volumes:
       - url_shortener_postgres_data:/var/lib/postgresql/data
+
+  nats:
+    image: nats:latest
+    container_name: nats_server
+    ports:
+      - '4222:4222' # NATS client connections
+      - '8222:8222' # NATS monitoring dashboar
+    command: ['-js'] # enable JetStream (optional, for persistence)
 
 volumes:
   url_shortener_postgres_data:

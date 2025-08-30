@@ -1,8 +1,8 @@
-import { INestApplication } from '@nestjs/common';
-import { getCurrentStage } from 'lib/env';
-import { AppLogger } from 'lib/logger/logger.service';
-import { PostgresConnectionOptions } from 'lib/postgres/contracts';
-import { PostgresClient } from 'lib/postgres/postgres.client';
+import { INestApplication, INestMicroservice } from '@nestjs/common';
+import { getCurrentStage } from '../../lib/env';
+import { AppLogger } from '../../lib/logger/logger.service';
+import { PostgresConnectionOptions } from '../../lib/postgres/contracts';
+import { PostgresClient } from '../../lib/postgres/postgres.client';
 import { BaseConfig } from './contracts';
 import { databaseConfigFields, hasRequiredProperties } from '../utils';
 
@@ -39,7 +39,7 @@ export const getPostgresConnectionConfig = async (
 
 export const onBoot = async <T extends Partial<BaseConfig>>(
   config: Readonly<T>,
-  app: INestApplication,
+  app: INestApplication  | INestMicroservice,
 ): Promise<void> => {
   await app.get(AppLogger).initialize();
 

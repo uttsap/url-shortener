@@ -1,8 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoggerModule } from 'lib/logger/logger.module';
+import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
+import { cleanDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CounterRepository } from '../persistance/repositories/counter.repository';
 import { AliasService } from './alias.service';
@@ -11,6 +13,7 @@ import { CounterService } from './counter.service';
 describe('AliasService', () => {
   let service: AliasService;
   let app: INestApplication;
+  let postgresClient: PostgresClient;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -23,6 +26,8 @@ describe('AliasService', () => {
     await app.init();
 
     service = module.get<AliasService>(AliasService);
+    postgresClient = module.get<PostgresClient>(PostgresClient);
+    await cleanDatabase(postgresClient);
   });
 
   afterEach(async () => {

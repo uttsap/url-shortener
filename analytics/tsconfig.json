@@ -23,7 +23,8 @@
     "resolveJsonModule": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "lib/*": ["../lib/*"]
+      "lib/*": ["../lib/*"],
+      "common/*": ["../common/*"]
     }
   }
 }

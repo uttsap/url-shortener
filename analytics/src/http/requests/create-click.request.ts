@@ -2,7 +2,7 @@ import { IsIP, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateClickRequest {
   @IsString()
-  userAlias: string;
+  alias: string;
 
   @IsOptional()
   @IsString()

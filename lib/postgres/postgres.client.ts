@@ -1,8 +1,8 @@
 import assert from 'assert';
 import { Injectable } from '@nestjs/common';
-import { AppLogger } from 'lib/logger/logger.service';
-import { ModelConstructor } from 'lib/postgres/models/BaseModel';
 import { Pool, PoolConfig, QueryResultRow } from 'pg';
+import { AppLogger } from '../../lib/logger/logger.service';
+import { ModelConstructor } from '../../lib/postgres/models/BaseModel';
 import { PostgresConnectionOptions } from './contracts';
 import {
   AnyReleasableQueryRunner,

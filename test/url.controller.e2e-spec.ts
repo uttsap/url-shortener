@@ -6,9 +6,11 @@ import { LoggerModule } from '../lib/logger/logger.module';
 import { PostgresModule } from '../lib/postgres/postgres.module';
 import { config } from '../src/config/app.config';
 import { UrlController } from '../src/http/controllers/url.controller';
+import { NatsModule } from '../src/nats/nats.module';
 import { CounterRepository } from '../src/persistance/repositories/counter.repository';
 import { UrlRepository } from '../src/persistance/repositories/url.repository';
 import { AliasService } from '../src/services/alias.service';
+import { AnalyticsPublisher } from '../src/services/analytics.publisher';
 import { CounterService } from '../src/services/counter.service';
 import { UrlService } from '../src/services/url.service';
 
@@ -17,7 +19,7 @@ describe('UrlController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [PostgresModule, LoggerModule],
+      imports: [PostgresModule, LoggerModule, NatsModule.forRootAsync(config)],
       controllers: [UrlController],
       providers: [
         UrlService,
@@ -25,9 +27,16 @@ describe('UrlController (e2e)', () => {
         CounterService,
         UrlRepository,
         CounterRepository,
+        AnalyticsPublisher,
         {
           provide: 'APP_CONFIG',
           useValue: config
+        },
+        {
+          provide: 'ANALYTICS_SERVICE',
+          useValue: {
+            emit: jest.fn()
+          }
         }
       ]
     }).compile();
@@ -46,7 +55,9 @@ describe('UrlController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   describe('POST /shorten', () => {

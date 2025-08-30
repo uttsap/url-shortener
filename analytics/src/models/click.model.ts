@@ -1,6 +1,6 @@
 export interface Click {
   id: number;
-  userAlias: string;
+  alias: string;
   timestamp: Date;
   userAgent?: string;
   ip?: string;
@@ -10,7 +10,7 @@ export interface Click {
 }
 
 export interface CreateClickParams {
-  userAlias: string;
+  alias: string;
   userAgent?: string;
   ip?: string;
   referrer?: string;

@@ -1,32 +1,44 @@
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoggerModule } from 'lib/logger/logger.module';
+import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
+import { cleanDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CreateShortUrlRequest } from '../http/requests/create-shorturl.request';
+import { NatsModule } from '../nats/nats.module';
 import { CounterRepository } from '../persistance/repositories/counter.repository';
 import { UrlRepository } from '../persistance/repositories/url.repository';
 import { AliasService } from './alias.service';
+import { AnalyticsPublisher } from './analytics.publisher';
 import { CounterService } from './counter.service';
 import { UrlService } from './url.service';
 
 describe('UrlService', () => {
   let service: UrlService;
   let app: INestApplication;
+  let postgresClient: PostgresClient;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      imports: [PostgresModule, LoggerModule],
+      imports: [PostgresModule, LoggerModule, NatsModule.forRootAsync(config)],
       providers: [
         UrlService,
         AliasService,
         CounterService,
         UrlRepository,
         CounterRepository,
+        AnalyticsPublisher,
         {
           provide: 'APP_CONFIG',
           useValue: config
+        },
+        {
+          provide: 'ANALYTICS_SERVICE',
+          useValue: {
+            emit: jest.fn()
+          }
         }
       ]
     }).compile();
@@ -36,10 +48,14 @@ describe('UrlService', () => {
     await app.init();
 
     service = module.get<UrlService>(UrlService);
+    postgresClient = module.get<PostgresClient>(PostgresClient);
+    await cleanDatabase(postgresClient);
   });
 
   afterEach(async () => {
-    await app.close();
+    if (app) {
+      await app.close();
+    }
   });
 
   describe('createShortUrl', () => {

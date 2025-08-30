@@ -13,11 +13,10 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,lib,test}/**/*.ts\" --fix",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
-    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test": "jest --maxWorkers=1 --detectOpenHandles --logHeapUsage --silent --forceExit",
+    "test:watch": "jest --watch --maxWorkers=1 --detectOpenHandles --logHeapUsage --silent --forceExit",
+    "test:cov": "jest --coverage --maxWorkers=1 --detectOpenHandles --logHeapUsage --silent --forceExit",
+    "test:e2e": "jest --config ./test/jest-e2e.json --maxWorkers=1 --detectOpenHandles --logHeapUsage --silent --forceExit"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",

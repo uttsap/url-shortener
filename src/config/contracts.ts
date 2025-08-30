@@ -6,4 +6,5 @@ import { BaseConfig } from 'common/config/contracts';
  */
 export type AppConfig = BaseConfig & {
   shortUrlExpiryTime: number; // in seconds
+  natsEndpoint: string;
 };
