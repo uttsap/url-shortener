@@ -25,4 +25,12 @@ export class UrlRepository extends Repository {
     this.assertExactlyOneResult(result);
     return new ShortUrl(result[0]);
   }
+
+  public async deleteExpiredUrls() {
+    const query = `
+    DELETE FROM url_shortener.urls WHERE expiry_time < $1 RETURNING alias;
+    `;
+    const result = await this.db.write(query, [new Date()]);
+    return result.map((row) => row.alias);
+  }
 }

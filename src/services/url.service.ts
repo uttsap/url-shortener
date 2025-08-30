@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 import { AnalyticsPayload } from 'common/contracts/analytics.payload';
 import type { Request } from 'express';
 import { CachedJson } from 'lib/cache/contracts/cache.response';
@@ -24,6 +25,16 @@ export class UrlService {
     private readonly analyticsPublisher: AnalyticsPublisher,
     private readonly cacheService: GlideCacheService
   ) {}
+
+  // deletes url that reached expiry time
+  @Cron('0 * * * *') // runs every hour
+  public async deleteExpiredUrls() {
+    const expiredUrls = await this.urlRepository.deleteExpiredUrls();
+    this.logger.debug(`Deleted ${expiredUrls.length} expired URLs`);
+    await Promise.all(
+      expiredUrls.map((alias) => this.cacheService.delCache(`url:${alias}`))
+    );
+  }
 
   /**
    * Creates a new short URL with optional alias.
@@ -74,11 +85,16 @@ export class UrlService {
   private async getUrlFromCacheOrDb(alias: string): Promise<ShortUrl | null> {
     // Check cache first
     const cached = await this.getUrlFromCache(alias);
-    if (cached) return cached;
+    if (cached) {
+      this.logger.debug(`Found in cache: ${alias}`);
+      return cached;
+    }
 
     // Fallback to DB
+    this.logger.debug(`Not found in cache, checking db: ${alias}`);
     const fromDb = await this.getUrlFromDatabase(alias);
     if (fromDb) {
+      this.logger.debug(`Found in db: ${alias}`);
       await this.saveUrlToCache(alias, fromDb);
     }
 
