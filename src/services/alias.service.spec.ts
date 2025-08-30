@@ -4,7 +4,7 @@ import { LoggerModule } from 'lib/logger/logger.module';
 import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
-import { cleanDatabase } from '../../test/utils/test-utils';
+import { cleanDatabase, setupTestDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CounterRepository } from '../persistance/repositories/counter.repository';
 import { AliasService } from './alias.service';
@@ -27,6 +27,7 @@ describe('AliasService', () => {
 
     service = module.get<AliasService>(AliasService);
     postgresClient = module.get<PostgresClient>(PostgresClient);
+    await setupTestDatabase(postgresClient);
     await cleanDatabase(postgresClient);
   });
 
@@ -45,8 +46,10 @@ describe('AliasService', () => {
 
       // Assert
       expect(result).toBeDefined();
-      expect(typeof result).toBe('string');
-      expect(result.length).toBeGreaterThan(0);
+      expect(result).toHaveProperty('id');
+      expect(result).toHaveProperty('alias');
+      expect(typeof result.alias).toBe('string');
+      expect(result.alias.length).toBeGreaterThan(0);
 
       // Restore Math.random
       Math.random = originalRandom;
@@ -62,9 +65,9 @@ describe('AliasService', () => {
       const result3 = await service.generate();
 
       // Assert
-      expect(result1).not.toBe(result2);
-      expect(result2).not.toBe(result3);
-      expect(result1).not.toBe(result3);
+      expect(result1.alias).not.toBe(result2.alias);
+      expect(result2.alias).not.toBe(result3.alias);
+      expect(result1.alias).not.toBe(result3.alias);
 
       Math.random = originalRandom;
     });
@@ -77,8 +80,8 @@ describe('AliasService', () => {
         const originalRandom = Math.random;
         Math.random = jest.fn().mockReturnValue((shardId - 1) * 0.25); // Map to correct shard
 
-        const alias = await service.generate();
-        aliases.push(alias);
+        const result = await service.generate();
+        aliases.push(result.alias);
 
         Math.random = originalRandom;
       }
@@ -101,8 +104,8 @@ describe('AliasService', () => {
       // Assert
       // Base62 alphabet: 0-9, A-Z, a-z
       const base62Regex = /^[0-9A-Za-z]+$/;
-      expect(result).toMatch(base62Regex);
-      expect(result.length).toBeGreaterThan(0);
+      expect(result.alias).toMatch(base62Regex);
+      expect(result.alias.length).toBeGreaterThan(0);
 
       Math.random = originalRandom;
     });
@@ -125,14 +128,14 @@ describe('AliasService', () => {
       expect(results.length).toBe(10);
 
       // All results should be unique
-      const uniqueResults = new Set(results);
+      const uniqueResults = new Set(results.map((r) => r.alias));
       expect(uniqueResults.size).toBe(10);
 
       // All results should be valid base62 strings
       const base62Regex = /^[0-9A-Za-z]+$/;
-      results.forEach((alias) => {
-        expect(alias).toMatch(base62Regex);
-        expect(alias.length).toBeGreaterThan(0);
+      results.forEach((result) => {
+        expect(result.alias).toMatch(base62Regex);
+        expect(result.alias.length).toBeGreaterThan(0);
       });
     });
   });

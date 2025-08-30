@@ -3,6 +3,7 @@ import { CounterRepository } from 'src/persistance/repositories/counter.reposito
 
 @Injectable()
 export class CounterService {
+  private readonly SHARD_RANGE = 10_000_000n;
   constructor(private readonly counterRepository: CounterRepository) {}
 
   public async increment(): Promise<bigint> {
@@ -11,6 +12,6 @@ export class CounterService {
     const value = BigInt(counter.value);
     // Combine shard + counter → global unique number
     // shift shard id into high bits
-    return (BigInt(shardId) << BigInt(48)) | value;
+    return BigInt(shardId - 1) * this.SHARD_RANGE + value;
   }
 }

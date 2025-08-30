@@ -6,8 +6,8 @@ import { CounterService } from './counter.service';
 export class AliasService {
   constructor(private readonly counterService: CounterService) {}
 
-  public async generate(): Promise<string> {
+  public async generate(): Promise<{ id: bigint; alias: string }> {
     const counter = await this.counterService.increment();
-    return base62Encode(counter);
+    return { id: counter, alias: base62Encode(counter) };
   }
 }

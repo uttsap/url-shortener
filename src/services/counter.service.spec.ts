@@ -4,7 +4,7 @@ import { LoggerModule } from 'lib/logger/logger.module';
 import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
-import { cleanDatabase } from '../../test/utils/test-utils';
+import { cleanDatabase, setupTestDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CounterRepository } from '../persistance/repositories/counter.repository';
 import { CounterService } from './counter.service';
@@ -26,6 +26,7 @@ describe('CounterService', () => {
 
     service = module.get<CounterService>(CounterService);
     postgresClient = module.get<PostgresClient>(PostgresClient);
+    await setupTestDatabase(postgresClient);
     await cleanDatabase(postgresClient);
   });
 

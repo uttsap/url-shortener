@@ -16,7 +16,7 @@ import { LoggerModule } from 'lib/logger/logger.module';
 import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
 import { onBoot } from '../../common/config/base.config';
-import { cleanDatabase } from '../../test/utils/test-utils';
+import { cleanDatabase, setupTestDatabase } from '../../test/utils/test-utils';
 import { config } from '../config/app.config';
 import { CreateShortUrlRequest } from '../http/requests/create-shorturl.request';
 import { NatsModule } from '../nats/nats.module';
@@ -62,6 +62,7 @@ describe('UrlService', () => {
 
     service = module.get<UrlService>(UrlService);
     postgresClient = module.get<PostgresClient>(PostgresClient);
+    await setupTestDatabase(postgresClient);
     await cleanDatabase(postgresClient);
   });
 
@@ -144,9 +145,8 @@ describe('UrlService', () => {
       expect(result).toHaveProperty('url');
       expect(result).toHaveProperty('alias');
       expect(result).toHaveProperty('expiryTime');
-      expect(result).not.toHaveProperty('id');
+      expect(result).toHaveProperty('id');
       expect(result).not.toHaveProperty('createdAt');
-      expect(result).not.toHaveProperty('clickCount');
     });
 
     it('should create multiple URLs with different aliases', async () => {

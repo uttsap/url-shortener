@@ -27,12 +27,12 @@ export class UrlService {
   ) {}
 
   // deletes url that reached expiry time
-  @Cron('0 * * * *') // runs every hour
+  @Cron('0 * * * *') // runs every 1 hour
   public async deleteExpiredUrls() {
     const expiredUrls = await this.urlRepository.deleteExpiredUrls();
-    this.logger.debug(`Deleted ${expiredUrls.length} expired URLs`);
+    this.logger.debug(`Deleted ${expiredUrls?.length} expired URLs`);
     await Promise.all(
-      expiredUrls.map((alias) => this.cacheService.delCache(`url:${alias}`))
+      (expiredUrls || []).map((alias) => this.cacheService.delCache(`url:${alias}`))
     );
   }
 
@@ -42,13 +42,23 @@ export class UrlService {
   public async createShortUrl(request: CreateShortUrlRequest) {
     this.logger.debug('Creating short URL', { request });
 
-    const alias = request.alias ?? (await this.aliasService.generate());
+    // Generate id from CounterService
+    const { id, alias: _alias } = await this.aliasService.generate();
+
+    // Generate alias (base62 of the id, if alias not provided)
+    const alias = request.alias ?? _alias;
+
     const expiryTime = this.calculateExpiryTime();
 
-    const params: CreateShortUrlParams = { ...request, alias, expiryTime };
+    const params: CreateShortUrlParams = { ...request, id, alias, expiryTime };
     const shortUrl = await this.urlRepository.save(params);
 
-    return { url: shortUrl.url, alias: shortUrl.alias, expiryTime: shortUrl.expiryTime };
+    return {
+      id: shortUrl.id,
+      url: shortUrl.url,
+      alias: shortUrl.alias,
+      expiryTime: shortUrl.expiryTime
+    };
   }
 
   /**
@@ -102,13 +112,7 @@ export class UrlService {
   }
 
   private async getUrlFromDatabase(alias: string): Promise<ShortUrl | null> {
-    const query = `
-      SELECT alias, url, created_at AS "createdAt", expiry_time AS "expiryTime" 
-      FROM url_shortener.urls 
-      WHERE alias = $1 
-      LIMIT 1;
-    `;
-    return this.urlRepository.findOneOrFail<ShortUrl>(query, [alias]);
+    return this.urlRepository.findByAlias(alias);
   }
 
   private async saveUrlToCache(alias: string, url: ShortUrl): Promise<boolean> {
