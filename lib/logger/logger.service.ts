@@ -15,9 +15,10 @@ export class AppLogger extends AbstractLogger {
     const logMessageString = String(content.message);
     const requestId = getRequestId();
 
-    const baseContext = typeof content.context === 'object' && content.context !== null
-      ? content.context
-      : {};
+    const baseContext =
+      typeof content.context === 'object' && content.context !== null
+        ? content.context
+        : {};
 
     // Merge context with requestId if available
     const context = {
