@@ -1,4 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
+import { GlideCacheService } from 'lib/cache/glide.cache.service';
 import { AppConfigModule } from 'src/config/config.module';
 import { AppConfig } from 'src/config/contracts';
 import { NatsModule } from 'src/nats/nats.module';
@@ -21,6 +22,7 @@ export class ProvidersModule {
         AliasService,
         UrlRepository,
         AnalyticsPublisher,
+        GlideCacheService,
         UrlService
       ],
       exports: [
@@ -30,6 +32,7 @@ export class ProvidersModule {
         UrlRepository,
         UrlService,
         AnalyticsPublisher,
+        GlideCacheService,
         AppConfigModule // export config for other modules
       ]
     };

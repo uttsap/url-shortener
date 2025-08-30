@@ -1,5 +1,17 @@
+// Mock the GlideCacheService module to avoid open handle issues
+jest.mock('lib/cache/glide.cache.service', () => ({
+  GlideCacheService: jest.fn().mockImplementation(() => ({
+    setCache: jest.fn().mockResolvedValue({ success: true }),
+    getCache: jest.fn().mockResolvedValue({ success: false, data: null }),
+    delCache: jest.fn().mockResolvedValue({ success: true }),
+    flushAll: jest.fn().mockResolvedValue({ success: true }),
+    destroy: jest.fn().mockResolvedValue(undefined)
+  }))
+}));
+
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { GlideCacheService } from 'lib/cache/glide.cache.service';
 import { LoggerModule } from 'lib/logger/logger.module';
 import { PostgresClient } from 'lib/postgres/postgres.client';
 import { PostgresModule } from 'lib/postgres/postgres.module';
@@ -30,6 +42,7 @@ describe('UrlService', () => {
         UrlRepository,
         CounterRepository,
         AnalyticsPublisher,
+        GlideCacheService,
         {
           provide: 'APP_CONFIG',
           useValue: config
