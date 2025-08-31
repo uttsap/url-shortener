@@ -103,11 +103,6 @@ curl -X POST http://localhost:3001/api/v1/analytics/clicks \
 curl "http://localhost:3001/api/v1/analytics/stats?url_alias=abc123&start_date=2024-01-01"
 ```
 
-### Get Click Metrics
-```bash
-curl "http://localhost:3001/api/v1/analytics/metrics/abc123"
-```
-
 ## Integration
 
 This microservice is designed to work with the main URL shortener application. It can be used as:
