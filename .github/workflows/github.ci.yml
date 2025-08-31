@@ -27,7 +27,7 @@ jobs:
         run: |
           npm run lint && npm audit
           cd analytics
-          npm run lint && pm audit
+          npm run lint && npm audit
           cd ..
 
   test:
