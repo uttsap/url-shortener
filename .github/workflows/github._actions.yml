@@ -58,7 +58,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci && cd analytics && npm ci && cd ..
       - name: Setup Environment
-        run: cp .env.example .env && source .env
+        run: cp .env.example .env && source .env && cp .env.example analytics/.env && source analytics/.env
       - name: Run Migrations
         run: npm run migrate
       - name: Run Tests
