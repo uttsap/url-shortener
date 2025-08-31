@@ -36,9 +36,9 @@ jobs:
         ports:
           - 5432:5432
         env:
-          POSTGRES_USER: ${{ secrets.ITONICS_DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.ITONICS_DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.ITONICS_DB_DATABASE }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
       nats:
         image: nats:latest
         ports:
