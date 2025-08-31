@@ -1,4 +1,5 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common/exceptions';
 import { Cron } from '@nestjs/schedule';
 import { AnalyticsPayload } from 'common/contracts/analytics.payload';
 import type { Request } from 'express';
@@ -79,9 +80,8 @@ export class UrlService {
     await this.publishAnalytics(alias, req, latency, errorMessage);
 
     if (!redirectUrl) {
-      throw new HttpException(
-        errorMessage || 'Redirect URL not found',
-        HttpStatus.NOT_FOUND
+      throw new NotFoundException(
+        errorMessage || 'Redirect URL for provided alias not found'
       );
     }
 
@@ -103,10 +103,11 @@ export class UrlService {
     // Fallback to DB
     this.logger.debug(`Not found in cache, checking db: ${alias}`);
     const fromDb = await this.getUrlFromDatabase(alias);
-    if (fromDb) {
-      this.logger.debug(`Found in db: ${alias}`);
-      await this.saveUrlToCache(alias, fromDb);
+    if (!fromDb) {
+      throw new NotFoundException('Alias not found.');
     }
+    this.logger.debug(`Found in db: ${alias}`);
+    await this.saveUrlToCache(alias, fromDb);
 
     return fromDb;
   }

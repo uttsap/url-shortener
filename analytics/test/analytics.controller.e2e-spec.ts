@@ -260,8 +260,6 @@ describe('AnalyticsController (e2e)', () => {
     });
   });
 
-
-
   describe('GET /analytics/referrers', () => {
     beforeEach(async () => {
       // Seed sample data
@@ -327,8 +325,6 @@ describe('AnalyticsController (e2e)', () => {
       await request(app.getHttpServer()).get('/analytics/referrers').query({ limit }).expect(400);
     });
   });
-
-
 
   describe('Event Pattern: analytics.click', () => {
     it('should handle analytics click event', async () => {

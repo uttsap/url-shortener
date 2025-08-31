@@ -19,7 +19,7 @@ export class HttpLoggerMiddleware implements NestMiddleware {
       };
 
       this.logger.info(
-        `${req.ip} - ${new Date().toISOString()} "${req.method} ${req.originalUrl || req.url}"}`
+        `${req.ip} - ${new Date().toISOString()} "${req.method} ${req.originalUrl || req.url}"`
       );
       this.logger.debug('Request started', logContext);
 

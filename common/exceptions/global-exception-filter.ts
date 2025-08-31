@@ -11,6 +11,7 @@ import {
 import { ThrottlerException } from '@nestjs/throttler';
 import { Response } from 'express';
 import * as errorMessages from '../constants/errorMessage.json';
+import { DatabaseError } from 'pg';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
@@ -19,7 +20,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     let message = '';
-    const status = exception.status ? exception.status : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = exception.status || HttpStatus.INTERNAL_SERVER_ERROR;
 
     switch (true) {
       case exception instanceof ThrottlerException:
@@ -47,6 +48,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         break;
       case exception instanceof HttpException:
         message = errorMessages.serverError;
+        break;
+      case exception instanceof DatabaseError:
+        message = exception.detail ?? exception?.message
         break;
       default:
         message = errorMessages.serverError;
