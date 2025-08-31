@@ -4,7 +4,7 @@ import { IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validat
 export class AnalyticsQueryDto {
   @IsOptional()
   @IsString()
-  userAlias?: string;
+  alias?: string;
 
   @IsOptional()
   @IsDateString()
@@ -30,7 +30,7 @@ export class AnalyticsQueryDto {
 export class ReferrersQueryDto {
   @IsOptional()
   @IsString()
-  userAlias?: string;
+  alias?: string;
 
   @IsOptional()
   @Type(() => Number)

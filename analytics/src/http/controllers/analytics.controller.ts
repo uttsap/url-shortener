@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Query, ValidationPipe } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { AppLogger } from 'lib/logger/logger.service';
 import { AnalyticsService } from '../../services/analytics.service';
@@ -28,22 +28,9 @@ export class AnalyticsController {
     return this.analyticsService.getAnalyticsStats(queryDto);
   }
 
-  @Get('clicks/:urlAlias')
-  async getClicksByUrlAlias(@Param('urlAlias') urlAlias: string) {
-    return this.analyticsService.getClicksByUrlAlias(urlAlias);
-  }
-
   @Get('referrers')
   async getTopReferrers(@Query(ValidationPipe) queryDto: ReferrersQueryDto) {
-    return this.analyticsService.getTopReferrers(queryDto.userAlias, queryDto.limit);
-  }
-
-  @Get('referrers/:urlAlias')
-  async getTopReferrersByAlias(
-    @Param('urlAlias') urlAlias: string,
-    @Query(ValidationPipe) queryDto: ReferrersQueryDto
-  ) {
-    return this.analyticsService.getTopReferrers(urlAlias, queryDto.limit);
+    return this.analyticsService.getTopReferrers(queryDto.alias, queryDto.limit);
   }
 
   @Get('health')

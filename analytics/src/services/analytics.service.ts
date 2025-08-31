@@ -40,7 +40,7 @@ export class AnalyticsService {
     urlAlias?: string,
     limit: number = 10
   ): Promise<Array<{ referrer: string; count: number }>> {
-    const queryDto: AnalyticsQueryDto = { userAlias: urlAlias };
+    const queryDto: AnalyticsQueryDto = { alias: urlAlias };
     const stats = await this.clickRepository.getAnalyticsStats(queryDto);
     return stats.topReferrers.slice(0, limit);
   }

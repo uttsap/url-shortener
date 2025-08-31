@@ -1,98 +1,180 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A scalable, ready-to-deploy URL shortener service built using NestJs. This project is designed to offer an easy-to-set-up URL shortening service with analytics infrastructure. It leverages Docker, PostgreSQL, and Redis to ensure a robust and scalable system.
 
-## Project setup
+## Table of Contents
 
-```bash
-$ npm install
-```
+- [Features](#features)
+- [Architecture](#architecture)
+- [Endpoints](#endpoints)
+- [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+- [Usage](#usage)
+- [Local Development](#local-development)
+- [Design Approach](#design-approach)
+- [Scalability Solutions](#scalability-soluions)
 
-## Compile and run the project
+## Features
 
-```bash
-# development
-$ npm run start
+- **Shorten URLs**: Generate unique and short aliases for URLs.
+- **Analytics**: View analytics and metrics.
+- **Scalable Architecture**: Designed to scale horizontally to handle increased load.
+- **Docker Compose Setup**: Easy setup and deployment using Docker Compose.
 
-# watch mode
-$ npm run start:dev
+## Architecture
 
-# production mode
-$ npm run start:prod
-```
+![Architecture Diagram](docs/img/url-shortener.png)
 
-## Run tests
+This project follows a monorepo structure containing two main services:
 
-```bash
-# unit tests
-$ npm run test
+**System Overview**:
+The architecture consists of two microservices that communicate through NATS messaging:
 
-# e2e tests
-$ npm run test:e2e
+1. **URL Shortener Service** (Port 3000):
+   - Handles URL shortening requests and redirects
+   - Uses PostgreSQL for persistent storage
+   - Implements Redis caching for performance
+   - Includes rate limiting for API protection
 
-# test coverage
-$ npm run test:cov
-```
+2. **Analytics Service** (Port 3001):
+   - Processes click events via NATS subscriptions
+   - Stores analytics data in PostgreSQL
+   - Provides analytics endpoints for data retrieval
 
-## Deployment
+**Data Flow**:
+- User requests flow through the URL shortener service
+- Click events are published to NATS for analytics processing
+- Both services share the same PostgreSQL database for data consistency
+- Redis provides caching and rate limiting capabilities
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+1. **URL-Shortener Service**:
+    - Saves aliases to storage and cache (for the first 24 hours).
+    - Retrieves the full URL based on the alias and redirects to it.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+2. **Alias-Gen Service**:
+    - Uses a counter-based approach to generate aliases for full URLs.
+    - Employs PostgreSQL to maintain the counter value.
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+## Endpoints
+- *Url Shortener*: http://localhost:3000
+- *Analytics*: http://localhost:3001
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- **Create Alias**:
+    - `POST /url`
+    - Example Request Body: `{"url": "https://github.com/"}`
+    - Example Response: `{'status': 'OK', 'alias': 'alias'}`
 
-## Resources
+- **Redirect to Full URL**:
+    - `GET /{alias}`
+    - Redirects to the corresponding full URL.
 
-Check out a few resources that may come in handy when working with NestJS:
+- **Get clicks**:
+    - `GET /analytics/clicks?alias={alias}`
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+- **Get stats**:
+    - `GET /analytics/stats?alias={alias}`
 
-## Support
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Getting Started
 
-## Stay in touch
+### Prerequisites
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Docker and Docker Compose installed on your machine.
 
-## License
+### Installation
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/uttsap/url-shortener.git
+    ```
+2. Navigate to the project directory:
+    ```bash
+    cd url-shortener
+    ```
+3. Build and run the Docker Compose setup:
+    ```bash
+    docker-compose up --build -d
+
+### Usage
+
+1. Access the URL shortener service at [http://localhost:3000](http://localhost:3000).
+2. For analytics and metrics, access at [http://localhost:3001](http://localhost:3001).
+    - The service tracks `clicks`, which include information like:
+        - Redirect Timestamp
+        - Alias
+        - User IP address
+        - User Agent
+        - Referrer
+        - Latency of Redirect
+        - Error If Exists
+
+### Local Development
+
+Follow the steps in the [Local Development Setup](./docs/LOCAL_DEVELOPMENT.md) document to set up the project for local development.
+
+### Design Approach
+
+#### URL Shortener Service Design
+
+**Counter-Based Alias Generation**: 
+- Uses a PostgreSQL counter to generate sequential numeric IDs, then converts them to base62 for shorter representation
+- **Trade-off**: Sequential IDs are predictable but provide guaranteed uniqueness and efficient storage
+- **Alternative considered**: UUID-based approach would be more random but longer and harder to cache
+
+**Caching Strategy**:
+- Redis cache for the first 24 hours after creation to reduce database load
+- **Trade-off**: Memory usage vs performance - newer URLs are accessed more frequently
+- **Design decision**: 24-hour TTL balances cache efficiency with memory constraints
+
+**Redis Rate Limiter**:
+- Uses Redis-based rate limiting for distributed request throttling
+- **Trade-off**: Additional Redis dependency vs distributed rate limiting capability
+- **Benefit**: Shared rate limits across multiple instances and persistence across restarts
+
+**Database Design**:
+- Separate tables for URLs and counters to allow independent scaling
+- **Trade-off**: Additional complexity vs better performance isolation
+- **Benefit**: Counter table can be optimized separately for high-frequency updates
+
+#### Analytics Service Design
+
+**Event-Driven Architecture**:
+- Uses NATS messaging for loose coupling between URL shortener and analytics
+- **Trade-off**: Eventual consistency vs system decoupling
+- **Benefit**: Analytics service can be scaled independently and won't impact URL shortening performance
+
+**Click Tracking**:
+- Captures comprehensive metadata (IP, User-Agent, Referrer, Latency)
+- **Trade-off**: Privacy concerns vs detailed analytics
+- **Design decision**: Store raw data for flexibility in future analytics queries
+
+**Database Schema**:
+- Denormalized click events for query performance
+- **Trade-off**: Storage space vs query speed
+- **Benefit**: Fast aggregation queries without complex joins
+
+#### Overall Architecture Trade-offs
+
+**Monorepo vs Microservices**:
+- Monorepo structure for easier development and deployment
+- **Trade-off**: Coupled releases vs development simplicity
+- **Benefit**: Shared libraries and consistent tooling
+
+**PostgreSQL vs NoSQL**:
+- PostgreSQL for ACID compliance and relational queries
+- **Trade-off**: Schema flexibility vs data consistency
+- **Benefit**: Complex analytics queries and data integrity
+
+**Docker Compose for Development**:
+- Single command setup for all services
+- **Trade-off**: Production complexity vs development ease
+- **Benefit**: Consistent environment across team members
+
+### Scalability Solutions
+To ensure scalability and accommodate increasing user demand, employed the following strategies:
+- **Horizontal Scaling :** The system is designed to scale horizontally, allowing us to add more servers or instances to handle increased traffic efficiently. This approach ensures that platform remains responsive even during periods of high demand.
+- **Load Balancing :** We can utilize load balancers to distribute incoming traffic evenly across multiple servers or instances. This will help prevent any single server from becoming overwhelmed, improving overall system performance and reliability.
+- **Caching :** Implemented caching mechanisms to store frequently accessed data, such as static content or database query results. By caching data at various layers of our infrastructure, we reduce the need for repeated computations or database accesses, thereby improving response times and reducing server load.
+- **Asynchronous Processing :** For resource-intensive tasks or operations that can be performed asynchronously, we leverage asynchronous processing techniques. By offloading these tasks to background processes or separate service, we free up resources on the main application servers, improving overall system responsiveness.
+- **Database Sharding :** As the volume of data grows, we employ database sharding techniques to horizontally partition our database across multiple servers. This allows us to distribute the database workload and queries more evenly, preventing any single database server from becoming a bottleneck.

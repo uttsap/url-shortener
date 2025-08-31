@@ -179,7 +179,7 @@ describe('AnalyticsService', () => {
     it('should return clicks with userAlias filter', async () => {
       // Arrange
       const queryDto: AnalyticsQueryDto = {
-        userAlias: 'test-alias-1',
+        alias: 'test-alias-1',
       };
 
       // Act
@@ -236,7 +236,7 @@ describe('AnalyticsService', () => {
     it('should return empty array for non-existent alias', async () => {
       // Arrange
       const queryDto: AnalyticsQueryDto = {
-        userAlias: 'non-existent-alias',
+        alias: 'non-existent-alias',
       };
 
       // Act
@@ -277,7 +277,7 @@ describe('AnalyticsService', () => {
     it('should return analytics stats with userAlias filter', async () => {
       // Arrange
       const queryDto: AnalyticsQueryDto = {
-        userAlias: 'test-alias-1',
+        alias: 'test-alias-1',
       };
 
       // Act
@@ -317,7 +317,7 @@ describe('AnalyticsService', () => {
     it('should return correct error rate for clicks with errors', async () => {
       // Arrange
       const queryDto: AnalyticsQueryDto = {
-        userAlias: 'error-alias',
+        alias: 'error-alias',
       };
 
       // Act

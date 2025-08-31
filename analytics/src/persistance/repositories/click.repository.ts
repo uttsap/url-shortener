@@ -32,10 +32,10 @@ export class ClickRepository {
     const values: any[] = [];
     let paramCount = 0;
 
-    if (queryDto.userAlias) {
+    if (queryDto.alias) {
       paramCount++;
       query += ` AND url_alias = $${paramCount}`;
-      values.push(queryDto.userAlias);
+      values.push(queryDto.alias);
     }
 
     if (queryDto.startDate) {
@@ -73,10 +73,10 @@ export class ClickRepository {
     const values: any[] = [];
     let paramCount = 0;
 
-    if (queryDto.userAlias) {
+    if (queryDto.alias) {
       paramCount++;
       whereClause += ` AND url_alias = $${paramCount}`;
-      values.push(queryDto.userAlias);
+      values.push(queryDto.alias);
     }
 
     if (queryDto.startDate) {
