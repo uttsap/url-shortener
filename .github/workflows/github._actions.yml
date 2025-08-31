@@ -25,11 +25,7 @@ jobs:
         run: |
           npm run lint
           set -o pipefail
-          npm run audit 2>&1 | tee audit.log
-          if grep -c 'of the excluded vulnerabilities did not match any of the found vulnerabilities:' audit.log; then
-            echo "Please remove the excluded vulnerability from .nsprc"
-            exit 1
-          fi
+          npm audit
 
   test:
     runs-on: ubuntu-latest
