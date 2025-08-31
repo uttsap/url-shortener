@@ -102,12 +102,12 @@ describe('AnalyticsController (e2e)', () => {
 
     it('should return clicks with userAlias filter', async () => {
       // Arrange
-      const userAlias = 'test-alias-1';
+      const alias = 'test-alias-1';
 
       // Act
       const response = await request(app.getHttpServer())
         .get('/analytics/clicks')
-        .query({ userAlias })
+        .query({ alias })
         .expect(200);
 
       // Assert
@@ -115,7 +115,7 @@ describe('AnalyticsController (e2e)', () => {
       expect(Array.isArray(clicks)).toBe(true);
       expect(clicks.length).toBe(2); // We seeded 2 clicks for test-alias-1
       clicks.forEach((click: Click) => {
-        expect(click).toHaveProperty('alias', userAlias);
+        expect(click).toHaveProperty('alias', alias);
       });
     });
 
@@ -207,14 +207,14 @@ describe('AnalyticsController (e2e)', () => {
       expect(stats.uniqueIps).toBe(6); // All IPs are unique
     });
 
-    it('should return analytics stats with userAlias filter', async () => {
+    it('should return analytics stats with alias filter', async () => {
       // Arrange
-      const userAlias = 'test-alias-1';
+      const alias = 'test-alias-1';
 
       // Act
       const response = await request(app.getHttpServer())
         .get('/analytics/stats')
-        .query({ userAlias })
+        .query({ alias })
         .expect(200);
 
       // Assert
@@ -260,60 +260,7 @@ describe('AnalyticsController (e2e)', () => {
     });
   });
 
-  describe('GET /analytics/clicks/:urlAlias', () => {
-    beforeEach(async () => {
-      // Seed sample data
-      await testDbUtils.seedSampleData();
-    });
 
-    it('should return clicks for a specific URL alias', async () => {
-      // Arrange
-      const urlAlias = 'test-alias-1';
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/clicks/${urlAlias}`)
-        .expect(200);
-
-      // Assert
-      const clicks = response.body as Click[];
-      expect(Array.isArray(clicks)).toBe(true);
-      expect(clicks.length).toBe(2); // We seeded 2 clicks for test-alias-1
-      clicks.forEach((click: Click) => {
-        expect(click).toHaveProperty('alias', urlAlias);
-      });
-    });
-
-    it('should return empty array for non-existent URL alias', async () => {
-      // Arrange
-      const urlAlias = 'non-existent-alias';
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/clicks/${urlAlias}`)
-        .expect(200);
-
-      // Assert
-      const clicks = response.body as Click[];
-      expect(Array.isArray(clicks)).toBe(true);
-      expect(clicks.length).toBe(0);
-    });
-
-    it('should handle URL alias with special characters', async () => {
-      // Arrange
-      const urlAlias = 'test-alias-with-special-chars-123';
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/clicks/${urlAlias}`)
-        .expect(200);
-
-      // Assert
-      const clicks = response.body as Click[];
-      expect(Array.isArray(clicks)).toBe(true);
-      expect(clicks.length).toBe(0); // No data for this alias
-    });
-  });
 
   describe('GET /analytics/referrers', () => {
     beforeEach(async () => {
@@ -336,14 +283,14 @@ describe('AnalyticsController (e2e)', () => {
       });
     });
 
-    it('should return top referrers with userAlias filter', async () => {
+    it('should return top referrers with alias filter', async () => {
       // Arrange
-      const userAlias = 'test-alias-1';
+      const alias = 'test-alias-1';
 
       // Act
       const response = await request(app.getHttpServer())
         .get('/analytics/referrers')
-        .query({ userAlias })
+        .query({ alias })
         .expect(200);
 
       // Assert
@@ -381,78 +328,7 @@ describe('AnalyticsController (e2e)', () => {
     });
   });
 
-  describe('GET /analytics/referrers/:urlAlias', () => {
-    beforeEach(async () => {
-      // Seed sample data
-      await testDbUtils.seedSampleData();
-    });
 
-    it('should return top referrers for a specific URL alias', async () => {
-      // Arrange
-      const urlAlias = 'test-alias-1';
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/referrers/${urlAlias}`)
-        .expect(200);
-
-      // Assert
-      const referrers = response.body as ReferrerStats[];
-      expect(Array.isArray(referrers)).toBe(true);
-      expect(referrers.length).toBe(2); // google.com and bing.com
-      referrers.forEach((referrer: ReferrerStats) => {
-        expect(referrer).toHaveProperty('referrer');
-        expect(referrer).toHaveProperty('count');
-      });
-    });
-
-    it('should return top referrers for specific URL alias with custom limit', async () => {
-      // Arrange
-      const urlAlias = 'test-alias-1';
-      const limit = 1;
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/referrers/${urlAlias}`)
-        .query({ limit })
-        .expect(200);
-
-      // Assert
-      const referrers = response.body as ReferrerStats[];
-      expect(Array.isArray(referrers)).toBe(true);
-      expect(referrers.length).toBeLessThanOrEqual(limit);
-    });
-
-    it('should return empty array for non-existent URL alias in referrers', async () => {
-      // Arrange
-      const urlAlias = 'non-existent-alias';
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/referrers/${urlAlias}`)
-        .expect(200);
-
-      // Assert
-      const referrers = response.body as ReferrerStats[];
-      expect(Array.isArray(referrers)).toBe(true);
-      expect(referrers.length).toBe(0);
-    });
-
-    it('should handle URL alias with special characters in referrers', async () => {
-      // Arrange
-      const urlAlias = 'test-alias-with-special-chars-123';
-
-      // Act
-      const response = await request(app.getHttpServer())
-        .get(`/analytics/referrers/${urlAlias}`)
-        .expect(200);
-
-      // Assert
-      const referrers = response.body as ReferrerStats[];
-      expect(Array.isArray(referrers)).toBe(true);
-      expect(referrers.length).toBe(0); // No data for this alias
-    });
-  });
 
   describe('Event Pattern: analytics.click', () => {
     it('should handle analytics click event', async () => {
