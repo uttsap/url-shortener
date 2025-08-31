@@ -12,23 +12,12 @@ A NestJS-based microservice for handling analytics data for the URL shortener ap
 
 ## API Endpoints
 
-### Core Analytics
-- `POST /api/v1/analytics/clicks` - Record a new click
-- `GET /api/v1/analytics/clicks` - Get click data with filters
-- `GET /api/v1/analytics/clicks/:urlAlias` - Get clicks for specific URL
-- `GET /api/v1/analytics/stats` - Get aggregated statistics
+### Stats
+- `GET /analytics/stats` - Get click stats
 
-### Metrics
-- `GET /api/v1/analytics/metrics` - Get click metrics (total, today, week, month)
-- `GET /api/v1/analytics/metrics/:urlAlias` - Get metrics for specific URL
+### Clicks
+- `GET /analytics/clicks` - Get clicks
 
-### Trends
-- `GET /api/v1/analytics/trends/hourly` - Get hourly click trends
-- `GET /api/v1/analytics/trends/hourly/:urlAlias` - Get hourly trends for specific URL
-
-### Referrers
-- `GET /api/v1/analytics/referrers` - Get top referrers
-- `GET /api/v1/analytics/referrers/:urlAlias` - Get referrers for specific URL
 
 ### Health Check
 - `GET /api/v1/analytics/health` - Service health check
@@ -66,19 +55,6 @@ npm run start:dev
 npm run build
 npm run start:prod
 ```
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `ANALYTICS_PORT` | Port for the analytics service | `3001` |
-| `DATABASE_HOST` | PostgreSQL host | `localhost` |
-| `DATABASE_PORT` | PostgreSQL port | `5432` |
-| `DATABASE_NAME` | Database name | `url_shortener` |
-| `DATABASE_USER` | Database user | `postgres` |
-| `DATABASE_PASSWORD` | Database password | |
-| `NODE_ENV` | Environment stage | `development` |
-| `CORS_ORIGIN` | CORS origin | `*` |
 
 ## Architecture
 
@@ -138,22 +114,7 @@ This microservice is designed to work with the main URL shortener application. I
 
 1. **Standalone Service**: Run independently and communicate via HTTP API
 2. **Library Integration**: Import modules directly in other NestJS applications
-3. **Event-Driven**: Integrate with message queues for real-time analytics
-
-## Development
-
-### Code Structure
-```
-src/
-├── controllers/          # API controllers
-├── services/            # Business logic
-├── repositories/        # Data access
-├── models/             # Data models
-├── dto/                # Data transfer objects
-├── modules/            # NestJS modules
-├── config/             # Configuration
-└── main.ts             # Application bootstrap
-```
+3. **Event-Driven**: Integrate with message queues for real-time
 
 ### Testing
 ```bash
