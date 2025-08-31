@@ -13,7 +13,7 @@ A scalable, ready-to-deploy URL shortener service built using NestJs. This proje
 - [Usage](#usage)
 - [Local Development](#local-development)
 - [Design Approach](#design-approach)
-- [Scalability Solutions](#scalability-soluions)
+- [Scalability Solutions](#scalability-solutions)
 
 ## Features
 
