@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["**"]
+  push:
+    branches:
+      - test
+      - stage
+      - main
+
+jobs:
+  dependencies:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          
+      - name: Install Dependencies
+        run: npm ci
+
+  build:
+    runs-on: ubuntu-latest
+    needs: dependencies
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Url Shortener
+        run: npm run build
+      - name: Build Analytics
+        run: cd analytics/ && npm run build && cd ..
+
+  lint:
+    runs-on: ubuntu-latest
+    needs: dependencies
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint & Audit
+        run: |
+          npm run lint
+          set -o pipefail
+          npm run audit 2>&1 | tee audit.log
+          if grep -c 'of the excluded vulnerabilities did not match any of the found vulnerabilities:' audit.log; then
+            echo "Please remove the excluded vulnerability from .nsprc"
+            exit 1
+          fi
+
+  test:
+    runs-on: ubuntu-latest
+    needs: dependencies
+    services:
+      postgres:
+        image: postgres:15-alpine
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: ${{ secrets.ITONICS_DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.ITONICS_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.ITONICS_DB_DATABASE }}
+      nats:
+        image: nats:latest
+        ports:
+          - '4222:4222' # NATS client connections
+      redis:
+        image: redis/redis-stack:7.0.6-RC9
+        ports:
+          - 6379:6379
+          - 8001:8001
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Environment
+        run: cp .env.example .env && source .env
+      - name: Run Migrations
+        run: npm run migrate
+      - name: Run Tests
+        run: NODE_OPTIONS="--max-old-space-size=4096" npm run test && npm run test:e2e && cd analytics && npm run test && npm run test:e2e && cd ..
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/**
+
+  # sonarqube:
+  #   runs-on: ubuntu-latest
+  #   needs: [build, test, lint]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: SonarQube Analysis
