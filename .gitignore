@@ -3,6 +3,7 @@
 /node_modules
 /build
 *.d.ts
+*.js.map
 
 # Logs
 logs
