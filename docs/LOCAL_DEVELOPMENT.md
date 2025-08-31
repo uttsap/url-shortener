@@ -24,7 +24,7 @@ First, clone the repo and set up dependencies:
    ```
 5. Run docker images for postgres, nats and redis
    ```bash
-   docker compose -f docker-compose-test.yml up -d
+   docker compose -f docker-compose-dev.yml up -d
    ```
 6. Run migrations
    ```bash
