@@ -8,18 +8,23 @@ import {
   NotFoundException,
   ServiceUnavailableException
 } from '@nestjs/common';
+import { ThrottlerException } from '@nestjs/throttler';
 import { Response } from 'express';
 import * as errorMessages from '../constants/errorMessage.json';
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: any, host: ArgumentsHost) {
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     let message = '';
     const status = exception.status ? exception.status : HttpStatus.INTERNAL_SERVER_ERROR;
 
     switch (true) {
+      case exception instanceof ThrottlerException:
+        message = 'Too many requests from this IP, please try again later.';
+        break;
       case exception instanceof BadRequestException: {
         const res = exception.getResponse();
         let msg: string | undefined;

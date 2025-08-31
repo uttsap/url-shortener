@@ -84,8 +84,6 @@ export class UrlRepository extends Repository {
 
     if (aliasResult.length === 0) return [];
 
-    console.log('aliasResult', aliasResult);
-
     const urlIds = aliasResult.map((row) => row.id);
 
     await this.db.write(`DELETE FROM url_shortener.urls WHERE id = ANY($1)`, [urlIds]);

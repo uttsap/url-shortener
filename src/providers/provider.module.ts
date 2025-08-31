@@ -5,6 +5,7 @@ import { AppConfig } from 'src/config/contracts';
 import { NatsModule } from 'src/nats/nats.module';
 import { CounterRepository } from 'src/persistance/repositories/counter.repository';
 import { UrlRepository } from 'src/persistance/repositories/url.repository';
+import { RateLimiterModule } from 'src/rate-limiter/throttle.module';
 import { AliasService } from 'src/services/alias.service';
 import { AnalyticsPublisher } from 'src/services/analytics.publisher';
 import { CounterService } from 'src/services/counter.service';
@@ -15,7 +16,11 @@ export class ProvidersModule {
   static forRoot(config: AppConfig): DynamicModule {
     return {
       module: ProvidersModule,
-      imports: [AppConfigModule.forRoot(config), NatsModule.forRootAsync(config)], // provide APP_CONFIG dynamically
+      imports: [
+        AppConfigModule.forRoot(config), // provide APP_CONFIG dynamically
+        NatsModule.forRootAsync(config),
+        RateLimiterModule.forRootAsync(config)
+      ],
       providers: [
         CounterRepository,
         CounterService,
