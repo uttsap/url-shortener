@@ -14,6 +14,8 @@ A scalable, ready-to-deploy URL shortener service built using NestJs. This proje
 - [Local Development](#local-development)
 - [Design Approach](#design-approach)
 - [Scalability Solutions](#scalability-solutions)
+- [Performance Benchmarks](#performance-benchmarks)
+- [Further Optimizations](#further-optimizations)
 
 ## Features
 
@@ -242,3 +244,15 @@ To ensure scalability and accommodate increasing user demand, employed the follo
 - **Caching :** Implemented caching mechanisms to store frequently accessed data, such as static content or database query results. By caching data at various layers of our infrastructure, we reduce the need for repeated computations or database accesses, thereby improving response times and reducing server load.
 - **Asynchronous Processing :** For resource-intensive tasks or operations that can be performed asynchronously, we leverage asynchronous processing techniques. By offloading these tasks to background processes or separate service, we free up resources on the main application servers, improving overall system responsiveness.
 - **Database Sharding :** As the volume of data grows, we employ database sharding techniques to horizontally partition our database across multiple servers. This allows us to distribute the database workload and queries more evenly, preventing any single database server from becoming a bottleneck.
+
+### Performance Benchmarks
+
+The URL Shortener and Analytics services have been thoroughly load tested to ensure optimal performance under various conditions. Load testing was performed using industry-standard tools including **wrk** for high-concurrency testing and **Apache Bench (ab)** for request rate analysis.
+
+For detailed performance metrics, latency analysis, throughput measurements, and stress test results, see the comprehensive benchmark report: [Benchmark Summary](./docs/BENCHMARK_SUMMARY.md)
+
+### Further Optimizations
+1. **Caching**: Add response caching for analytics stats
+2. **Monitoring**: Implement Prometheus metrics
+3. **Load Balancing**: Add load balancer for multiple instances
+4. **Database**: Consider read replicas for analytics
