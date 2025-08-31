@@ -1,4 +1,4 @@
-name: CI
+name: Build Pipeline
 
 on:
   pull_request:
@@ -22,13 +22,24 @@ jobs:
           cache: npm
           
       - name: Install Dependencies
-        run: npm ci
+        run: npm ci && cd analytics && npm ci && cd ..
+
+      - name: Upload node_modules
+        uses: actions/upload-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
 
   build:
     runs-on: ubuntu-latest
     needs: dependencies
     steps:
       - uses: actions/checkout@v4
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
       - name: Build Url Shortener
         run: npm run build
       - name: Build Analytics
@@ -39,6 +50,11 @@ jobs:
     needs: dependencies
     steps:
       - uses: actions/checkout@v4
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
       - name: Lint & Audit
         run: |
           npm run lint
@@ -72,6 +88,11 @@ jobs:
           - 8001:8001
     steps:
       - uses: actions/checkout@v4
+      - name: Download node_modules
+        uses: actions/download-artifact@v4
+        with:
+          name: node_modules
+          path: node_modules
       - name: Setup Environment
         run: cp .env.example .env && source .env
       - name: Run Migrations
@@ -83,10 +104,3 @@ jobs:
         with:
           name: coverage
           path: coverage/**
-
-  # sonarqube:
-  #   runs-on: ubuntu-latest
-  #   needs: [build, test, lint]
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: SonarQube Analysis
