@@ -247,7 +247,7 @@ To ensure scalability and accommodate increasing user demand, employed the follo
 
 ### Performance Benchmarks
 
-The URL Shortener and Analytics services have been thoroughly load tested to ensure optimal performance under various conditions. Load testing was performed using industry-standard tools including **wrk** for high-concurrency testing and **Apache Bench (ab)** for request rate analysis.
+Load testing was performed using industry-standard tools including **wrk** for high-concurrency testing and **Apache Bench (ab)** for request rate analysis.
 
 For detailed performance metrics, latency analysis, throughput measurements, and stress test results, see the comprehensive benchmark report: [Benchmark Summary](./docs/BENCHMARK_SUMMARY.md)
 
